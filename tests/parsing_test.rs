@@ -1,6 +1,6 @@
 extern crate fdt_rs;
 
-use fdt_rs::base::DevTree;
+use fdt_rs::base::{DevTree, DevTreeItem};
 use fdt_rs::error::{DevTreeError, Result};
 use fdt_rs::index::DevTreeIndex;
 use fdt_rs::prelude::*;
