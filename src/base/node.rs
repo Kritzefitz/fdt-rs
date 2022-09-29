@@ -6,6 +6,7 @@ use crate::base::iters::{
     DevTreeNodePropIter, DevTreeSiblingsAndDescendantsIter, DevTreeSiblingsIter,
 };
 use crate::error::Result;
+use crate::prelude::FallibleIterator;
 
 /// A handle to a Device Tree Node within the device tree.
 #[derive(Clone)]
@@ -98,5 +99,24 @@ impl<'a, 'dt: 'a> DevTreeNode<'a, 'dt> {
     /// Return the next sibling of this node.
     pub fn next_sibling(&self) -> Result<Option<DevTreeNode<'a, 'dt>>> {
         self.siblings().next_node()
+    }
+
+    /// Returns the [`DevTreeNode`] at the given path below this node.
+    pub fn node_at_path<'s, I>(&self, path: I) -> Result<Option<DevTreeNode<'a, 'dt>>>
+    where
+        I: Iterator<Item = &'s str>,
+    {
+        let mut current = self.clone();
+        for component in path {
+            if let Some(found) = current
+                .child_nodes()
+                .find(|node| Ok(node.name()? == component))?
+            {
+                current = found;
+            } else {
+                return Ok(None);
+            }
+        }
+        Ok(Some(current))
     }
 }
