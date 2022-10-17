@@ -62,6 +62,65 @@ impl<'a, 'dt: 'a> Iterator for DevTreeReserveEntryIter<'a, 'dt> {
     }
 }
 
+pub trait DevTreeIterator<'a, 'dt: 'a> {
+    fn next_item_with_depth(&mut self) -> Result<Option<(DevTreeItem<'a, 'dt>, isize)>>;
+
+    fn next_item(&mut self) -> Result<Option<DevTreeItem<'a, 'dt>>> {
+        self.next_item_with_depth().map(|o| o.map(|(item, _)| item))
+    }
+
+    fn next_prop(&mut self) -> Result<Option<DevTreeProp<'a, 'dt>>> {
+        loop {
+            match self.next_item() {
+                Ok(Some(DevTreeItem::Prop(p))) => return Ok(Some(p)),
+                Ok(Some(_n)) => continue,
+                Ok(None) => return Ok(None),
+                Err(e) => return Err(e),
+            }
+        }
+    }
+
+    fn next_node(&mut self) -> Result<Option<DevTreeNode<'a, 'dt>>> {
+        loop {
+            match self.next_item() {
+                Ok(Some(DevTreeItem::Node(n))) => return Ok(Some(n)),
+                Ok(Some(_p)) => continue,
+                Ok(None) => return Ok(None),
+                Err(e) => return Err(e),
+            }
+        }
+    }
+
+    fn next_node_prop(&mut self) -> Result<Option<DevTreeProp<'a, 'dt>>> {
+        match self.next_item() {
+            // Return if a new node or an EOF.
+            Ok(Some(item)) => Ok(item.prop()),
+            Ok(None) => Ok(None),
+            Err(e) => Err(e),
+        }
+    }
+
+    fn next_compatible_node(&mut self, string: &str) -> Result<Option<DevTreeNode<'a, 'dt>>> {
+        // If there is another node, advance our iterator to that node.
+        self.next_node().and_then(|_| {
+            // Iterate through all remaining properties in the tree looking for the compatible
+            // string.
+            loop {
+                match self.next_prop() {
+                    Ok(Some(prop)) => {
+                        if prop.name()? == "compatible" && prop.str()? == string {
+                            return Ok(Some(prop.node()));
+                        }
+                        continue;
+                    }
+                    Ok(None) => return Ok(None),
+                    Err(e) => return Err(e),
+                }
+            }
+        })
+    }
+}
+
 /// An iterator over all [`DevTreeItem`] objects.
 #[derive(Clone, PartialEq)]
 pub struct DevTreeIter<'a, 'dt: 'a> {
@@ -155,7 +214,9 @@ impl<'a, 'dt: 'a> DevTreeIter<'a, 'dt> {
         }
         None
     }
+}
 
+impl<'a, 'dt: 'a> DevTreeIterator<'a, 'dt> for DevTreeIter<'a, 'dt> {
     fn next_item_with_depth(&mut self) -> Result<Option<(DevTreeItem<'a, 'dt>, isize)>> {
         loop {
             let old_offset = self.offset;
@@ -201,61 +262,6 @@ impl<'a, 'dt: 'a> DevTreeIter<'a, 'dt> {
                 None => return Ok(None),
             }
         }
-    }
-
-    pub fn next_item(&mut self) -> Result<Option<DevTreeItem<'a, 'dt>>> {
-        self.next_item_with_depth().map(|o| o.map(|(item, _)| item))
-    }
-
-    pub fn next_prop(&mut self) -> Result<Option<DevTreeProp<'a, 'dt>>> {
-        loop {
-            match self.next() {
-                Ok(Some(DevTreeItem::Prop(p))) => return Ok(Some(p)),
-                Ok(Some(_n)) => continue,
-                Ok(None) => return Ok(None),
-                Err(e) => return Err(e),
-            }
-        }
-    }
-
-    pub fn next_node(&mut self) -> Result<Option<DevTreeNode<'a, 'dt>>> {
-        loop {
-            match self.next() {
-                Ok(Some(DevTreeItem::Node(n))) => return Ok(Some(n)),
-                Ok(Some(_p)) => continue,
-                Ok(None) => return Ok(None),
-                Err(e) => return Err(e),
-            }
-        }
-    }
-
-    pub fn next_node_prop(&mut self) -> Result<Option<DevTreeProp<'a, 'dt>>> {
-        match self.next() {
-            // Return if a new node or an EOF.
-            Ok(Some(item)) => Ok(item.prop()),
-            Ok(None) => Ok(None),
-            Err(e) => Err(e),
-        }
-    }
-
-    pub fn next_compatible_node(&mut self, string: &str) -> Result<Option<DevTreeNode<'a, 'dt>>> {
-        // If there is another node, advance our iterator to that node.
-        self.next_node().and_then(|_| {
-            // Iterate through all remaining properties in the tree looking for the compatible
-            // string.
-            loop {
-                match self.next_prop() {
-                    Ok(Some(prop)) => {
-                        if prop.name()? == "compatible" && prop.str()? == string {
-                            return Ok(Some(prop.node()));
-                        }
-                        continue;
-                    }
-                    Ok(None) => return Ok(None),
-                    Err(e) => return Err(e),
-                }
-            }
-        })
     }
 }
 

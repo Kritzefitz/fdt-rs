@@ -1,7 +1,7 @@
 #[cfg(doc)]
 use super::*;
 
-use crate::base::iters::{DevTreeIter, DevTreeNodePropIter};
+use crate::base::iters::{DevTreeIter, DevTreeIterator, DevTreeNodePropIter};
 use crate::error::Result;
 
 /// A handle to a Device Tree Node within the device tree.
