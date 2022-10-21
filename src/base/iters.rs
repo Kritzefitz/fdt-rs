@@ -256,6 +256,33 @@ impl<'a, 'dt: 'a> DevTreeIter<'a, 'dt> {
         }
         None
     }
+
+    // The following functions are duplicates of those in
+    // DevTreeIterator and only provided here for backwards
+    // compatibility.
+    pub fn next_item_with_depth(&mut self) -> Result<Option<(DevTreeItem<'a, 'dt>, isize)>> {
+        DevTreeIterator::next_item_with_depth(self)
+    }
+
+    pub fn next_item(&mut self) -> Result<Option<DevTreeItem<'a, 'dt>>> {
+        DevTreeIterator::next_item(self)
+    }
+
+    pub fn next_prop(&mut self) -> Result<Option<DevTreeProp<'a, 'dt>>> {
+        DevTreeIterator::next_prop(self)
+    }
+
+    pub fn next_node(&mut self) -> Result<Option<DevTreeNode<'a, 'dt>>> {
+        DevTreeIterator::next_node(self)
+    }
+
+    pub fn next_node_prop(&mut self) -> Result<Option<DevTreeProp<'a, 'dt>>> {
+        DevTreeIterator::next_node_prop(self)
+    }
+
+    pub fn next_compatible_node(&mut self, string: &str) -> Result<Option<DevTreeNode<'a, 'dt>>> {
+        DevTreeIterator::next_compatible_node(self, string)
+    }
 }
 
 impl<'a, 'dt: 'a> DevTreeIterator<'a, 'dt> for DevTreeIter<'a, 'dt> {
