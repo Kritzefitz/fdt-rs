@@ -152,6 +152,20 @@ impl<'a, 'dt: 'a> FallibleIterator for DevTreeNodeIter<'a, 'dt> {
     }
 }
 
+pub struct DevTreeNodeFilter<I>(pub I);
+/*
+impl<'a, 'dt: 'a, I> FallibleIterator for DevTreeNodeFilter<I>
+where
+    I: DevTreeIterator<'a, 'dt>,
+{
+    type Error = DevTreeError;
+    type Item = DevTreeNode<'a, 'dt>;
+    fn next(&mut self) -> Result<Option<Self::Item>> {
+        self.0.next_node()
+    }
+}
+ */
+
 #[derive(Clone, PartialEq)]
 pub struct DevTreePropIter<'a, 'dt: 'a>(pub DevTreeIter<'a, 'dt>);
 impl<'a, 'dt: 'a> FallibleIterator for DevTreePropIter<'a, 'dt> {
@@ -162,6 +176,20 @@ impl<'a, 'dt: 'a> FallibleIterator for DevTreePropIter<'a, 'dt> {
     }
 }
 
+pub struct DevTreePropFilter<I>(pub I);
+/*
+impl<'a, 'dt: 'a, I> FallibleIterator for DevTreePropFilter<I>
+where
+    I: DevTreeIterator<'a, 'dt>,
+{
+    type Error = DevTreeError;
+    type Item = DevTreeProp<'a, 'dt>;
+    fn next(&mut self) -> Result<Option<Self::Item>> {
+        self.0.next_prop()
+    }
+}
+ */
+
 #[derive(Clone, PartialEq)]
 pub struct DevTreeNodePropIter<'a, 'dt: 'a>(pub DevTreeIter<'a, 'dt>);
 impl<'a, 'dt: 'a> FallibleIterator for DevTreeNodePropIter<'a, 'dt> {
@@ -171,6 +199,20 @@ impl<'a, 'dt: 'a> FallibleIterator for DevTreeNodePropIter<'a, 'dt> {
         self.0.next_node_prop()
     }
 }
+
+pub struct DevTreeNodePropFilter<I>(pub I);
+/*
+impl<'a, 'dt: 'a, I> FallibleIterator for DevTreeNodePropFilter<I>
+where
+    I: DevTreeIterator<'a, 'dt>,
+{
+    type Error = DevTreeError;
+    type Item = DevTreeProp<'a, 'dt>;
+    fn next(&mut self) -> Result<Option<Self::Item>> {
+        self.0.next_node_prop()
+    }
+}
+ */
 
 #[derive(Clone, PartialEq)]
 pub struct DevTreeCompatibleNodeIter<'s, 'a, 'dt: 'a> {
