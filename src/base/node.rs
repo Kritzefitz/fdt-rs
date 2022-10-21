@@ -66,17 +66,16 @@ impl<'a, 'dt: 'a> DevTreeNode<'a, 'dt> {
         DevTreeNodeFilter(self.children())
     }
 
-    /// Return an iterator over all descendants of this node, all
-    /// siblings after the node and their descendants. If you only
-    /// want siblings and their descendants, but not this node's
-    /// descendants, first use [`next_sibling`](Self::next_sibling) and then
-    /// [`siblings_and_descendants`](Self::siblings_and_descendants) on that.
+    /// Return an iterator over all all siblings after this node and
+    /// their descendants. Note that this is dependant on the order of
+    /// the siblings in the DevTree as this can only return siblings
+    /// that come after this node, not previous siblings.
     pub fn siblings_and_descendants(&self) -> DevTreeSiblingsAndDescendantsIter<'a, 'dt> {
         DevTreeSiblingsAndDescendantsIter::new(self.parse_iter.clone())
     }
 
-    /// Return and iterator over all descendant nodes and following
-    /// siblings nodes and their descendant nodes.
+    /// Return and iterator over all following siblings nodes and
+    /// their descendant nodes.
     pub fn sibling_and_descendant_nodes(
         &self,
     ) -> DevTreeNodeFilter<DevTreeSiblingsAndDescendantsIter<'a, 'dt>> {
