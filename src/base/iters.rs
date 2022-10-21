@@ -498,22 +498,22 @@ where
 /// A variant of [`DevTreeIter`] limited to only descendants of a
 /// given node.
 #[derive(Clone, PartialEq)]
-pub struct DevTreeDescendantIter<'a, 'dt>(DevTreeMinDepthIter<'a, 'dt>);
+pub struct DevTreeDescendantsIter<'a, 'dt>(DevTreeMinDepthIter<'a, 'dt>);
 
-impl<'a, 'dt> DevTreeDescendantIter<'a, 'dt> {
+impl<'a, 'dt> DevTreeDescendantsIter<'a, 'dt> {
     pub(crate) fn new(iter: DevTreeIter<'a, 'dt>) -> Self {
         let target_depth = iter.depth + 1;
         Self(DevTreeMinDepthIter::new(iter, target_depth))
     }
 }
 
-impl<'a, 'dt> DevTreeIterator<'a, 'dt> for DevTreeDescendantIter<'a, 'dt> {
+impl<'a, 'dt> DevTreeIterator<'a, 'dt> for DevTreeDescendantsIter<'a, 'dt> {
     fn next_item_with_depth(&mut self) -> Result<Option<(DevTreeItem<'a, 'dt>, isize)>> {
         self.0.next_item_with_depth()
     }
 }
 
-impl<'a, 'dt> FallibleIterator for DevTreeDescendantIter<'a, 'dt> {
+impl<'a, 'dt> FallibleIterator for DevTreeDescendantsIter<'a, 'dt> {
     type Error = DevTreeError;
     type Item = DevTreeItem<'a, 'dt>;
 
@@ -557,11 +557,11 @@ impl<'a, 'dt> FallibleIterator for DevTreeChildrenIter<'a, 'dt> {
 /// siblings that come after the reference node, but not any before
 /// that node.
 #[derive(Clone, PartialEq)]
-pub struct DevTreeSiblingAndDescendantIterator<'a, 'dt>(
+pub struct DevTreeSiblingsAndDescendantsIter<'a, 'dt>(
     DevTreeSkipCurrentIter<DevTreeMinDepthIter<'a, 'dt>>,
 );
 
-impl<'a, 'dt> DevTreeSiblingAndDescendantIterator<'a, 'dt> {
+impl<'a, 'dt> DevTreeSiblingsAndDescendantsIter<'a, 'dt> {
     pub(crate) fn new(iter: DevTreeIter<'a, 'dt>) -> Self {
         let current_depth = iter.depth;
         Self(DevTreeSkipCurrentIter::new(
@@ -571,13 +571,13 @@ impl<'a, 'dt> DevTreeSiblingAndDescendantIterator<'a, 'dt> {
     }
 }
 
-impl<'a, 'dt> DevTreeIterator<'a, 'dt> for DevTreeSiblingAndDescendantIterator<'a, 'dt> {
+impl<'a, 'dt> DevTreeIterator<'a, 'dt> for DevTreeSiblingsAndDescendantsIter<'a, 'dt> {
     fn next_item_with_depth(&mut self) -> Result<Option<(DevTreeItem<'a, 'dt>, isize)>> {
         self.0.next_item_with_depth()
     }
 }
 
-impl<'a, 'dt> FallibleIterator for DevTreeSiblingAndDescendantIterator<'a, 'dt> {
+impl<'a, 'dt> FallibleIterator for DevTreeSiblingsAndDescendantsIter<'a, 'dt> {
     type Error = DevTreeError;
     type Item = DevTreeItem<'a, 'dt>;
 
@@ -593,9 +593,9 @@ impl<'a, 'dt> FallibleIterator for DevTreeSiblingAndDescendantIterator<'a, 'dt> 
 /// given node. Note that this will only yield siblings that come
 /// after the reference node, but not any before that node.
 #[derive(Clone, PartialEq)]
-struct DevTreeSiblingIter<'a, 'dt>(DevTreeSkipCurrentIter<DevTreeDepthIter<'a, 'dt>>);
+pub struct DevTreeSiblingsIter<'a, 'dt>(DevTreeSkipCurrentIter<DevTreeDepthIter<'a, 'dt>>);
 
-impl<'a, 'dt> DevTreeSiblingIter<'a, 'dt> {
+impl<'a, 'dt> DevTreeSiblingsIter<'a, 'dt> {
     pub(crate) fn new(iter: DevTreeIter<'a, 'dt>) -> Self {
         let current_depth = iter.depth;
         Self(DevTreeSkipCurrentIter::new(
@@ -605,13 +605,13 @@ impl<'a, 'dt> DevTreeSiblingIter<'a, 'dt> {
     }
 }
 
-impl<'a, 'dt> DevTreeIterator<'a, 'dt> for DevTreeSiblingIter<'a, 'dt> {
+impl<'a, 'dt> DevTreeIterator<'a, 'dt> for DevTreeSiblingsIter<'a, 'dt> {
     fn next_item_with_depth(&mut self) -> Result<Option<(DevTreeItem<'a, 'dt>, isize)>> {
         self.0.next_item_with_depth()
     }
 }
 
-impl<'a, 'dt> FallibleIterator for DevTreeSiblingIter<'a, 'dt> {
+impl<'a, 'dt> FallibleIterator for DevTreeSiblingsIter<'a, 'dt> {
     type Error = DevTreeError;
     type Item = DevTreeItem<'a, 'dt>;
 
